@@ -75,8 +75,8 @@ class StartupWindow:
 		self.url_entry.insert(0, loadURL())
 		self.url_entry.grid(padx = 8, columnspan = 2)
 
-		self.interval_label = Label(self.root, text = 'Odotusaika: (>10) ')
-		self.interval_label.grid(pady = 8, sticky = E)
+		self.time_label = Label(self.root, text = 'Odotusaika: (>10) ')
+		self.time_label.grid(pady = 8, sticky = E)
 
 		self.time_input = StringVar(self.root)
 		self.time_entry = Entry(self.root, width = 8, textvariable = self.time_input)
@@ -102,8 +102,9 @@ class StartupWindow:
 			if interval < 10:
 				raise Exception('Interval time too short')
 		except Exception as e:
-			print(e)
-			self.time_label.configure(text ='ANNA AIKA NUMEROINA', fg = 'red')
+			print('main/startup: ' + str(e))
+			self.time_label.configure(text ='Anna aika oikeassa muodossa!', fg = 'red')
+			return
 		saveURL(url)
 		self.root.destroy()
 		Notifier(url, interval)

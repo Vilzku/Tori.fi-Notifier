@@ -25,7 +25,14 @@ class Scraper:
 		items = table.find_all('a')
 
 		listings = []
+		n = 0;
 		for item in items:
+
+			# new listings are always found on top of the list
+			if n > 10:
+				break
+			n += 1
+
 			try:
 				item_id = item['id']
 				item_url = item['href']

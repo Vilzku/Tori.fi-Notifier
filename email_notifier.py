@@ -2,6 +2,8 @@ import smtplib
 import login_details
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.header import Header
+from email.utils import formataddr
 
 
 class Emailer():
@@ -13,7 +15,7 @@ class Emailer():
 	def create_email(self, item):
 		message = MIMEMultipart('alternative')
 		message['Subject'] = 'UUSI ILMOITUS - {}'.format(item.title)
-		message['From'] = self.email
+		message['From'] = formataddr((str(Header('Tori Notifier', 'utf-8')), self.email))
 		message['To'] = self.receiver
 
 		text = '''
@@ -46,6 +48,7 @@ class Emailer():
 				server.sendmail(self.email, self.receiver, message.as_string())
 				server.close()
 		except Exception as e:
-			print(e)
+			print('email_notifier/send: ' + str(e))
 		else:
 			print('Email sent')
+
