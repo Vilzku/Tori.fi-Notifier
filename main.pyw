@@ -33,8 +33,9 @@ def saveURL(url):
 
 
 class Notifier:
-	def __init__(self, url):
+	def __init__(self, url, interval):
 		self.url = url
+		self.interval = interval
 		self.loop()
 
 	def loop(self):
@@ -42,7 +43,7 @@ class Notifier:
 		print('Loop started. Running in the background...')
 		loop_no = 1;
 		while True:
-			sleep(60)
+			sleep(self.interval)
 			new_listings = getListings(self.url)
 			temp_listings = new_listings.copy()
 			print('[Loop {}] Comparing results... {} items found.'.format(loop_no, len(new_listings)))
@@ -55,7 +56,7 @@ class Notifier:
 			loop_no += 1
 			self.notify(new_listings)
 
-	def notify(listings):
+	def notify(self, listings):
 		for item in listings:
 			root = Tk()
 			root.title('Toriscraper - Uusi ilmoitus!')
@@ -74,39 +75,48 @@ class Notifier:
 			open_button.grid(pady = 8)
 			root.mainloop()
 
+class startupWindow:
+	def __init__(self):
+		self.root = Tk()
+		self.root.title('Toriscraper')
 
-def startup():
-	try:
-		url = url_input.get()
-		getListings(url) # Test run that everything is ok
-	except Exception as e: 
-		url_label.configure(text ='Anna toimiva URL-osoite!', fg = 'red')
-		return
-	saveURL(url)
-	root.destroy()
-	Notifier(url)
+		self.url_label = Label(self.root, text = 'Anna tori.fi -haun URL-osoite')
+		self.url_label.grid(pady = 8, columnspan = 2)
 
+		self.url_input = StringVar(self.root)
+		self.url_entry = Entry(self.root, width = 48, textvariable = self.url_input)
+		self.url_entry.insert(0, loadURL())
+		self.url_entry.grid(padx = 8, columnspan = 2)
 
-root = Tk()
-root.title('Toriscraper')
+		self.interval_label = Label(self.root, text = 'Odotusaika: (60) ')
+		self.interval_label.grid(pady = 8, sticky = E)
 
-url_label = Label(root, text = 'Anna tori.fi -haun URL-osoite')
-url_label.grid(pady = 8, columnspan = 2)
+		self.time_input = StringVar(self.root)
+		self.time_entry = Entry(self.root, width = 8, textvariable = self.time_input)
+		self.time_entry.insert(0, 60)
+		self.time_entry.grid(row = 2, column = 1, pady = 8, sticky = W)
 
-url_input = StringVar(root)
-url_entry = Entry(root, width = 48, textvariable = url_input)
-url_entry.insert(0, loadURL())
-url_entry.grid(padx = 8, columnspan = 2)
+		self.load_button = Button(self.root, text = 'ALOITA', font = (0), command = self.startup, bg = 'green')
+		self.load_button.grid(pady = 8, columnspan = 2)
 
-interval_label = Label(root, text = 'Odotusaika: ')
-interval_label.grid(pady = 8, sticky = E)
+		self.root.mainloop()
 
-time_input = IntVar(root)
-time_entry = Entry(root, width = 8, textvariable = time_input)
-time_entry.insert(0, 6)
-time_entry.grid(row = 2, column = 1, pady = 8, sticky = W)
+	def startup(self):
+		try:
+			url = self.url_input.get()
+			
+			getListings(url) # Test run that everything is ok
+		except Exception as e:
+			print(e)
+			self.url_label.configure(text ='Anna toimiva URL-osoite!', fg = 'red')
+			return
+		try:
+			interval = int(self.time_entry.get())
+		except Exception as e:
+			print(e)
+			self.time_label.configure(text ='ANNA AIKA NUMEROINA', fg = 'red')
+		saveURL(url)
+		self.root.destroy()
+		Notifier(url, interval)
 
-load_button = Button(root, text = 'ALOITA', font = (0), command = startup, bg = 'green')
-load_button.grid(pady = 8, columnspan = 2)
-
-root.mainloop()
+startupWindow()
