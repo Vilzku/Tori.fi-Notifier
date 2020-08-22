@@ -58,27 +58,9 @@ class Notifier:
 			loop_no += 1
 			if len(new_listings) > 0:
 				print('{} new items!'.format(len(new_listings)))
-			self.notify(new_listings)
+			for item in new_listings:
+				self.emailer.create_email(item)
 
-	def notify(self, listings):
-		for item in listings:
-			self.emailer.create_email(item)
-			root = Tk()
-			root.title('Toriscraper - Uusi ilmoitus!')
-			title = Label(root, text = item.title, font = ('Arial', 12))
-			title.grid(padx = 8, pady = 8)
-			n = 0;
-			for param in item.params:
-				n += 1
-				if n == len(item.params):
-					price = Label(root, text = param, font = ('Arial', 18, 'bold'))
-					price.grid(pady = 8)
-				else:
-					param_label = Label(root, text = param)
-					param_label.grid()
-			open_button = Button(root, text = 'Avaa', font = (0), command = lambda: openURL(item.url))
-			open_button.grid(pady = 8)
-			root.mainloop()
 
 class StartupWindow:
 	def __init__(self):
@@ -93,7 +75,7 @@ class StartupWindow:
 		self.url_entry.insert(0, loadURL())
 		self.url_entry.grid(padx = 8, columnspan = 2)
 
-		self.interval_label = Label(self.root, text = 'Odotusaika: (60) ')
+		self.interval_label = Label(self.root, text = 'Odotusaika: (>10) ')
 		self.interval_label.grid(pady = 8, sticky = E)
 
 		self.time_input = StringVar(self.root)
@@ -117,6 +99,8 @@ class StartupWindow:
 			return
 		try:
 			interval = int(self.time_entry.get())
+			if interval < 10:
+				raise Exception('Interval time too short')
 		except Exception as e:
 			print(e)
 			self.time_label.configure(text ='ANNA AIKA NUMEROINA', fg = 'red')
