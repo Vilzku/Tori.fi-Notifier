@@ -2,6 +2,7 @@ from toriscraper import getListings
 from tkinter import *
 from time import sleep
 import webbrowser
+from email_notifier import *
 
 # URL
 # https://www.tori.fi/uusimaa/asunnot/vuokrattavat_asunnot?ca=18&cg=1010&st=u&c=1014&at=tenant&mre=5&w=109&m=157
@@ -16,7 +17,7 @@ def openURL(url):
 
 def loadURL():
 	try:
-		file = open('url.txt', "r")
+		file = open('url', "r")
 		url = file.readline()
 		file.close()
 	except Exception as e:
@@ -27,7 +28,7 @@ def loadURL():
 
 
 def saveURL(url):
-	file = open('url.txt', "w")
+	file = open('url', "w")
 	file.write(url)
 	file.close()
 
@@ -36,6 +37,7 @@ class Notifier:
 	def __init__(self, url, interval):
 		self.url = url
 		self.interval = interval
+		self.emailer = Emailer('torinotifier@gmail.com')
 		self.loop()
 
 	def loop(self):
@@ -54,10 +56,13 @@ class Notifier:
 
 			old_listings = temp_listings.copy()
 			loop_no += 1
+			if len(new_listings) > 0:
+				print('{} new items!'.format(len(new_listings)))
 			self.notify(new_listings)
 
 	def notify(self, listings):
 		for item in listings:
+			self.emailer.create_email(item)
 			root = Tk()
 			root.title('Toriscraper - Uusi ilmoitus!')
 			title = Label(root, text = item.title, font = ('Arial', 12))
@@ -75,7 +80,7 @@ class Notifier:
 			open_button.grid(pady = 8)
 			root.mainloop()
 
-class startupWindow:
+class StartupWindow:
 	def __init__(self):
 		self.root = Tk()
 		self.root.title('Toriscraper')
@@ -119,4 +124,4 @@ class startupWindow:
 		self.root.destroy()
 		Notifier(url, interval)
 
-startupWindow()
+StartupWindow()

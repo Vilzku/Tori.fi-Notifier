@@ -1,3 +1,4 @@
 *.txt
+url
 __pycache__/
-login_detaisl.py
+login_details.py
