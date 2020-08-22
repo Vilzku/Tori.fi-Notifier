@@ -13,6 +13,7 @@ def openURL(url):
 	except:
 		pass
 
+
 def loadURL():
 	try:
 		file = open('url.txt', "r")
@@ -29,6 +30,7 @@ def saveURL(url):
 	file = open('url.txt', "w")
 	file.write(url)
 	file.close()
+
 
 class Notifier:
 	def __init__(self, url):
@@ -51,30 +53,32 @@ class Notifier:
 
 			old_listings = temp_listings.copy()
 			loop_no += 1
+			self.notify(new_listings)
 
-			for item in new_listings:
-				root = Tk()
-				root.title('Toriscraper - Uusi ilmoitus!')
-				title = Label(root, text = item.title, font = ('Arial', 12))
-				title.grid(padx = 8, pady = 8)
-				n = 0;
-				for param in item.params:
-					n += 1
-					if n == len(item.params):
-						price = Label(root, text = param, font = ('Arial', 18, 'bold'))
-						price.grid(pady = 8)
-					else:
-						param_label = Label(root, text = param)
-						param_label.grid()
-				open_button = Button(root, text = 'Avaa', font = (0), command = lambda: openURL(item.url))
-				open_button.grid(pady = 8)
-				root.mainloop()
+	def notify(listings):
+		for item in listings:
+			root = Tk()
+			root.title('Toriscraper - Uusi ilmoitus!')
+			title = Label(root, text = item.title, font = ('Arial', 12))
+			title.grid(padx = 8, pady = 8)
+			n = 0;
+			for param in item.params:
+				n += 1
+				if n == len(item.params):
+					price = Label(root, text = param, font = ('Arial', 18, 'bold'))
+					price.grid(pady = 8)
+				else:
+					param_label = Label(root, text = param)
+					param_label.grid()
+			open_button = Button(root, text = 'Avaa', font = (0), command = lambda: openURL(item.url))
+			open_button.grid(pady = 8)
+			root.mainloop()
 
 
 def startup():
 	try:
 		url = url_input.get()
-		getListings(url)
+		getListings(url) # Test run that everything is ok
 	except Exception as e: 
 		url_label.configure(text ='Anna toimiva URL-osoite!', fg = 'red')
 		return
@@ -87,14 +91,22 @@ root = Tk()
 root.title('Toriscraper')
 
 url_label = Label(root, text = 'Anna tori.fi -haun URL-osoite')
-url_label.grid(pady = 8)
+url_label.grid(pady = 8, columnspan = 2)
 
 url_input = StringVar(root)
-url_entry = Entry(root, width = 96, textvariable = url_input)
+url_entry = Entry(root, width = 48, textvariable = url_input)
 url_entry.insert(0, loadURL())
-url_entry.grid(padx = 8)
+url_entry.grid(padx = 8, columnspan = 2)
+
+interval_label = Label(root, text = 'Odotusaika: ')
+interval_label.grid(pady = 8, sticky = E)
+
+time_input = IntVar(root)
+time_entry = Entry(root, width = 8, textvariable = time_input)
+time_entry.insert(0, 6)
+time_entry.grid(row = 2, column = 1, pady = 8, sticky = W)
 
 load_button = Button(root, text = 'ALOITA', font = (0), command = startup, bg = 'green')
-load_button.grid(pady = 8)
+load_button.grid(pady = 8, columnspan = 2)
 
 root.mainloop()
