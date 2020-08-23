@@ -3,11 +3,18 @@ import urllib.request
 
 
 class Item:
-	def __init__(self, item_id, item_title, item_params, item_url):
+	def __init__(self, item_id, item_url):
 		self.id = item_id
-		self.title = item_title
-		self.params = item_params
 		self.url = item_url
+
+
+class Info:
+	def __init__(self, title, price, lower_title, params_table, url):
+		self.title = title
+		self.price = price
+		self.lower_title = lower_title
+		self.params_table = params_table
+		self.url = url
 
 
 class Scraper:
@@ -36,17 +43,23 @@ class Scraper:
 			try:
 				item_id = item['id']
 				item_url = item['href']
-				item_title = item.find('div', {'class': 'li-title'}).text
-
-				details = item.find('div', {'class': 'list-details-container'})
-				item_param_elements = details.find_all('p')
-				item_params = [i.text for i in item_param_elements]
-
 				listing = Item(item_id, item_title, item_params, item_url)
 				listings.append(listing)
 			except Exception as e:
 				continue
 		return listings
+
+	def getInfo(self, soup, url):
+			title = soup.find('h1', {'itemprop': 'name'}).getText().strip()
+			price = soup.find('span', {'itemprop': 'price'}).getText().split('€')[0]
+			lower_title = ''
+			try:
+				lower_title = soup.find('div', {'class': 'ad_param'}).getText().strip()
+			except:
+				pass
+			params_table = soup.find('table', {'class': 'tech_data'})
+			return Info(title, price, lower_title, params_table, url)
+
 
 
 def getListings(search_url):
@@ -55,5 +68,15 @@ def getListings(search_url):
 	listings = scraper.getItems(soup)
 	return listings
 
+def getListingInfo(listing_url):
+	scraper = Scraper()
+	soup = scraper.getSoup(listing_url)
+	info = scraper.getInfo(soup, listing_url)
+	return info
+
 test_url = 'https://www.tori.fi/koko_suomi/autot?cg=2010'
-getListings(test_url)
+test_url2 = 'https://www.tori.fi/pirkanmaa/Hyundai_Tucson_71044467.htm?ca=18&w=3'
+
+#getListings(test_url)
+#info = getListingInfo(test_url2)
+#print(info.title, info.price, info.lower_title, info.params_table, info.url)
