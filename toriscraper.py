@@ -38,7 +38,7 @@ class Scraper:
 		for item in items:
 
 			# new listings are always found on top of the list
-			if n > 10:
+			if n > 15:
 				break
 			n += 1
 
