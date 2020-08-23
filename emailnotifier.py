@@ -4,6 +4,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
+from toriscraper import getListingInfo
+import emailmaker
 
 
 class Emailer():
@@ -13,24 +15,15 @@ class Emailer():
 		self.receiver = receiver
 
 	def create_email(self, item):
+		info = getListingInfo(item.url)
+
 		message = MIMEMultipart('alternative')
-		message['Subject'] = 'UUSI ILMOITUS - {}'.format(item.title)
+		message['Subject'] = 'UUSI ILMOITUS - {}'.format(info.title)
 		message['From'] = formataddr((str(Header('Tori Notifier', 'utf-8')), self.email))
 		message['To'] = self.receiver
 
-		text = '''
-		{0}
-		{1}
-		{2}
-		'''.format(item.title, item.params, item.url)
-
-		html = '''
-		<html>
-			<a href="{2}">{0}
-			{1}
-			</a>
-		</html>
-		'''.format(item.title, item.params, item.url)
+		text = '{} {} {}'.format(info.title, info.price, info.url)
+		html = emailmaker.make(info)
 
 		text_part = MIMEText(text, 'plain')
 		html_part = MIMEText(html, 'html')
@@ -50,5 +43,5 @@ class Emailer():
 		except Exception as e:
 			print('email_notifier/send: ' + str(e))
 		else:
-			print('Email sent')
+			print('Email sent to {}'.format(self.receiver))
 

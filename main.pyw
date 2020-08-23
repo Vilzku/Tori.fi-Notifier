@@ -2,10 +2,9 @@ from toriscraper import getListings
 from tkinter import *
 from time import sleep
 import webbrowser
-from email_notifier import *
+from toriscraper import getListings
+from emailnotifier import Emailer
 
-# URL
-# https://www.tori.fi/uusimaa/asunnot/vuokrattavat_asunnot?ca=18&cg=1010&st=u&c=1014&at=tenant&mre=5&w=109&m=157
 
 def openURL(url):
 	webbrowser.open(url)

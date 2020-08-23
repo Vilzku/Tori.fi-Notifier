@@ -9,11 +9,13 @@ class Item:
 
 
 class Info:
-	def __init__(self, title, price, lower_title, params_table, url):
+	def __init__(self, img_url, title, price, lower_title, params_table, details, url):
+		self.img_url = img_url
 		self.title = title
 		self.price = price
 		self.lower_title = lower_title
 		self.params_table = params_table
+		self.details = details
 		self.url = url
 
 
@@ -43,13 +45,17 @@ class Scraper:
 			try:
 				item_id = item['id']
 				item_url = item['href']
-				listing = Item(item_id, item_title, item_params, item_url)
+				listing = Item(item_id, item_url)
 				listings.append(listing)
 			except Exception as e:
 				continue
 		return listings
 
 	def getInfo(self, soup, url):
+			try:
+				img_url = soup.find('img', {'itemprop': 'image'})['src']
+			except:
+				img_url = ''
 			title = soup.find('h1', {'itemprop': 'name'}).getText().strip()
 			price = soup.find('span', {'itemprop': 'price'}).getText().split('€')[0]
 			lower_title = ''
@@ -58,7 +64,10 @@ class Scraper:
 			except:
 				pass
 			params_table = soup.find('table', {'class': 'tech_data'})
-			return Info(title, price, lower_title, params_table, url)
+			_details = soup.find('div', {'class': 'body'})
+			_details.find('b').decompose()
+			details = _details.getText().strip()
+			return Info(img_url, title, price, lower_title, params_table, details, url)
 
 
 
