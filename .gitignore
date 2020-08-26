@@ -1,4 +1,5 @@
 *.txt
 url
+email
 __pycache__/
 login_details.py
