@@ -35,7 +35,7 @@ def saveURL(url):
 def loadEmail():
 	try:
 		file = open('email', "r")
-		url = file.readline()
+		email = file.readline()
 		file.close()
 	except Exception as e:
 		print(e)
