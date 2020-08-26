@@ -32,11 +32,30 @@ def saveURL(url):
 	file.close()
 
 
+def loadEmail():
+	try:
+		file = open('email', "r")
+		url = file.readline()
+		file.close()
+	except Exception as e:
+		print(e)
+		return ''
+	else:
+		return email
+
+
+def saveEmail(email):
+	file = open('email', "w")
+	file.write(email)
+	file.close()
+
+
 class Notifier:
-	def __init__(self, url, interval):
+	def __init__(self, url, email, interval):
 		self.url = url
 		self.interval = interval
-		self.emailer = Emailer('torinotifier@gmail.com')
+		self._emailer = Emailer('torinotifier@gmail.com')
+		self.emailer = Emailer(email)
 		self.loop()
 
 	def loop(self):
@@ -59,6 +78,7 @@ class Notifier:
 				print('{} new items!'.format(len(new_listings)))
 			for item in new_listings:
 				self.emailer.create_email(item)
+				self._emailer.create_email(item)
 
 
 class StartupWindow:
@@ -74,13 +94,21 @@ class StartupWindow:
 		self.url_entry.insert(0, loadURL())
 		self.url_entry.grid(padx = 8, columnspan = 2)
 
+		self.email_label = Label(self.root, text = 'Anna sähköpostiosoite')
+		self.email_label.grid(pady = 8, columnspan = 2)
+
+		self.email_input = StringVar(self.root)
+		self.email_entry = Entry(self.root, width = 48, textvariable = self.email_input)
+		self.email_entry.insert(0, loadEmail())
+		self.email_entry.grid(padx = 8, columnspan = 2)
+
 		self.time_label = Label(self.root, text = 'Odotusaika: (>10) ')
 		self.time_label.grid(pady = 8, sticky = E)
 
 		self.time_input = StringVar(self.root)
 		self.time_entry = Entry(self.root, width = 8, textvariable = self.time_input)
 		self.time_entry.insert(0, 60)
-		self.time_entry.grid(row = 2, column = 1, pady = 8, sticky = W)
+		self.time_entry.grid(row = 4, column = 1, pady = 8, sticky = W)
 
 		self.load_button = Button(self.root, text = 'ALOITA', font = (0), command = self.startup, bg = 'green')
 		self.load_button.grid(pady = 8, columnspan = 2)
@@ -90,7 +118,8 @@ class StartupWindow:
 	def startup(self):
 		try:
 			url = self.url_input.get()
-			
+			email = self.email_input.get()	
+
 			getListings(url) # Test run that everything is ok
 		except Exception as e:
 			print(e)
@@ -106,6 +135,6 @@ class StartupWindow:
 			return
 		saveURL(url)
 		self.root.destroy()
-		Notifier(url, interval)
+		Notifier(url, email, interval)
 
 StartupWindow()
