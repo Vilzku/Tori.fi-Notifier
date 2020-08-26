@@ -134,6 +134,7 @@ class StartupWindow:
 			self.time_label.configure(text ='Anna aika oikeassa muodossa!', fg = 'red')
 			return
 		saveURL(url)
+		saveEmail(email)
 		self.root.destroy()
 		Notifier(url, email, interval)
 
