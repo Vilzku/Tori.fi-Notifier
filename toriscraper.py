@@ -38,16 +38,19 @@ class Scraper:
 		for item in items:
 
 			# new listings are always found on top of the list
-			if n > 15:
+			if n >= 15:
 				break
 			n += 1
 
 			try:
+				if item.find('div', {'class': 'date_image'}).getText().strip().split(' ')[0] != 'tänään':
+					continue
 				item_id = item['id']
 				item_url = item['href']
 				listing = Item(item_id, item_url)
 				listings.append(listing)
 			except Exception as e:
+				print(e)
 				continue
 		return listings
 
