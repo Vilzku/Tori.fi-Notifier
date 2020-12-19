@@ -1,7 +1,7 @@
 # Tori.fi-Notifier
 Sends a notification when a new listing appears on tori.fi
 
-Run main.pyw and  (1) insert a link to search result you want to track,  (2) your email where you want to receive notifications and (3) interval in seconds of how often the software needs to check tori.fi for new listings.
+Run main.pyw and  (1) insert a link to search result you want to track,  (2) your email where you want to receive notifications and (3) interval in seconds of how often the software needs to check tori.fi for new listings. To stop the notifier the process needs to be killed.
 
 <img src="https://i.imgur.com/K1RoREW.png">
 
